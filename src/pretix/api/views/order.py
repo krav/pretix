@@ -449,6 +449,16 @@ class OrderPositionViewSet(mixins.DestroyModelMixin, viewsets.ReadOnlyModelViewS
                 return prov
         raise NotFound('Unknown output provider.')
 
+    @detail_route(methods=['PUT'])
+    def update_name(self, request, **kwargs):
+        pos = self.get_object()
+        if request.data.get('email'):
+            pos.attendee_email = request.data.get('email')
+        if request.data.get('full_name'):
+            pos.attendee_name_parts = { "full_name": request.data.get('full_name') }
+        pos.save()
+        return Response({"email": pos.attendee_email, "full_name": pos.attendee_name})
+
     @detail_route(url_name='download', url_path='download/(?P<output>[^/]+)')
     def download(self, request, output, **kwargs):
         provider = self._get_output_provider(output)
